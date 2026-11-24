@@ -2,93 +2,84 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-// Progress of a package operation without a terminal: steps, one status line, and the raw output on request.
+// Progress of a package operation without a terminal. System Update shows the sleeping pup under a sunrise; removals
+// show the pup sliding out; everything else shows the pup walking to the tote bag. The raw output is one click away.
 // While the operation runs, closing the window only hides it.
 Window {
     id: window
     Shortcut { sequences: [StandardKey.Cancel]; onActivated: window.close() }  // Escape, as a QDialog
     property var store
+    property var catalog            // Opens an installed app
     property int jobId: 0
     property var job: ({})          // The operation's entry of store.activity
-    readonly property bool done: job.state === "done" || job.state === "failed"
-    readonly property bool ok: job.state === "done"
-    property string log: ""
+    property var meta: ({})         // From whoever queued it: {icon, key}
+
+    JobState { id: jobState; store: window.store; jobId: window.jobId; job: window.job }
+    readonly property string kind: job.title === "System Update" ? "update" : String(job.title ?? "").startsWith("Remove ") ? "remove" : "install"
+    readonly property string verb: String(job.title ?? "").match(/^(Install|Reinstall) /)?.[1] ?? ""
+    readonly property string name: String(job.title ?? "").replace(/^(Install|Reinstall|Remove) /, "").replace(/ from the AUR$/, "")
+    readonly property string percent: Math.round(jobState.progress * 100) + "%"
 
     title: job.title ?? ""
     flags: Qt.Dialog
     color: palette.window
-    width: Math.max(560, layout.implicitWidth + 20)
-    height: layout.implicitHeight + 20
-    minimumWidth: layout.implicitWidth + 20
-    minimumHeight: layout.implicitHeight + 20
-
-    function refresh() {
-        if (!store) return  // createObject can set job before store
-        log = store.jobLog(jobId)
-        const lines = log.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "").split(/[\n\r]/).map(l => l.trim()).filter(l => l !== "")
-        let fraction = 0
-        for (const line of lines) {
-            const percent = line.match(/(\d{1,3})%/)
-            if (percent && Number(percent[1]) <= 100) fraction = Number(percent[1]) / 100
-        }
-        track.fraction = fraction
-        const last = lines.length ? lines[lines.length - 1] : ""
-        phase.text = done ? (ok ? "Done" : "It did not finish. Open the details to see why.")
-            : last === "" ? "Starting…" : last.startsWith("==>") ? last.slice(3).trim() : last.startsWith("->") ? last.slice(2).trim() : last
-        if (done && !ok) details.checked = true
-    }
-    onJobChanged: refresh()
-    Component.onCompleted: refresh()
+    width: kind === "update" ? 560 : 440
+    readonly property int fitHeight: layout.implicitHeight + 28
+    height: fitHeight
+    minimumWidth: width
+    maximumWidth: width
+    minimumHeight: fitHeight
+    maximumHeight: fitHeight
+    readonly property bool failed: jobState.failed
+    onFailedChanged: if (failed) details.checked = true  // The output says why
 
     ColumnLayout {
         id: layout
-        anchors.fill: parent
-        anchors.margins: 10
+        x: 16
+        y: 14
+        width: window.width - 32
         spacing: 12
-        Label {
-            text: window.title
-            font.pointSize: Application.font.pointSize + 4
-            font.bold: true
+
+        Loader {
             Layout.fillWidth: true
-            Layout.preferredWidth: 520  // Long text wraps inside the step track's width instead of widening the window
-            wrapMode: Text.Wrap
-            textFormat: Text.PlainText
+            sourceComponent: window.kind === "update" ? sunrise : walk
         }
-        StepTrack {
-            id: track
-            Layout.fillWidth: true
-            Layout.minimumWidth: implicitWidth  // Room for every step name
-            names: window.job.steps && window.job.steps.length ? window.job.steps : ["Prepare", "Install"]
-            step: window.done && window.ok ? names.length : (window.job.step ?? 0)
-            failed: window.done && !window.ok
-            finished: window.done
-        }
-        Label {
-            id: phase
-            Layout.fillWidth: true
-            Layout.preferredWidth: 520
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            textFormat: Text.PlainText
-            color: palette.placeholderText
-            text: "Starting…"
-        }
-        ScrollView {
-            visible: details.checked
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            // A fixed size: the window follows the steps, not the length or width of the output
-            Layout.preferredWidth: 520
-            Layout.preferredHeight: 220
-            Layout.minimumHeight: 220
-            TextArea {
-                readOnly: true
-                text: window.log.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "")
-                font.family: "monospace"
-                wrapMode: TextEdit.NoWrap
-                onTextChanged: cursorPosition = length
+        Component {
+            id: sunrise
+            UpdateScene {
+                steps: jobState.steps
+                step: jobState.step
+                fraction: jobState.fraction
+                progress: jobState.progress
+                ok: jobState.ok
+                failed: jobState.failed
+                line: jobState.line
             }
         }
+        Component {
+            id: walk
+            OpScene {
+                removing: window.kind === "remove"
+                icon: window.meta.icon ?? ""
+                progress: jobState.progress
+                ok: jobState.ok
+                failed: jobState.failed
+                heading: window.kind === "remove"
+                    ? (jobState.ok ? window.name + " removed" : jobState.failed ? window.name + " is still installed" : "Removing " + window.name)
+                    : window.verb !== ""
+                    ? (jobState.ok ? window.name + " is ready" : jobState.failed ? window.name + " was not installed"
+                       : (window.verb === "Install" ? "Installing " : "Reinstalling ") + window.name)
+                    : (jobState.ok ? window.title + " finished" : jobState.failed ? window.title + " did not finish" : window.title)
+                subheading: jobState.failed ? "It did not finish. Open the details to see why."
+                    : jobState.ok ? (window.kind === "remove" ? "Removed from this computer"
+                                  : window.verb !== "" ? (window.meta.key ? "Find it in the app menu, or open it now" : "Find it in the app menu") : "")
+                    : jobState.line
+                hint: jobState.ok ? (window.kind === "remove" ? "Settings and data stay unless you ticked them" : "All " + jobState.steps.length + " steps done")
+                    : jobState.failed ? "Stopped at " + jobState.steps[jobState.step]
+                    : jobState.steps[jobState.step] + " · step " + (jobState.step + 1) + " of " + jobState.steps.length + " · " + window.percent
+            }
+        }
+
         RowLayout {
             ToolButton {
                 id: details
@@ -99,10 +90,31 @@ Window {
             }
             Item { Layout.fillWidth: true }
             Button {
-                text: window.done ? "Close" : "Hide"
-                ToolTip.visible: hovered && !window.done
+                text: jobState.ended ? "Close" : "Hide"
+                ToolTip.visible: hovered && !jobState.ended
                 ToolTip.text: "The operation keeps running; progress stays in Activity"
                 onClicked: window.close()
+            }
+            Button {
+                visible: jobState.ok && window.kind === "install" && window.verb !== "" && !!window.meta.key && !!window.catalog
+                text: "Open"
+                highlighted: true
+                onClicked: {
+                    const problem = window.catalog.launch(window.meta.key)
+                    if (problem === "") window.close()
+                }
+            }
+        }
+        ScrollView {
+            visible: details.checked
+            Layout.fillWidth: true
+            Layout.preferredHeight: 200
+            TextArea {
+                readOnly: true
+                text: jobState.log
+                font.family: "monospace"
+                wrapMode: TextEdit.NoWrap
+                onTextChanged: cursorPosition = length
             }
         }
     }

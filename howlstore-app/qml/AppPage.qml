@@ -53,16 +53,19 @@ Item {
     function remove() {
         const plan = JSON.parse(catalog.removePlan(appKey))
         if (plan.error) return
-        removeWindow.ask(plan.name, [{ text: plan.option, checked: true }], plan.leftovers)
+        removeWindow.ask(plan.name, [{ text: plan.option, checked: true }], plan.leftovers, details.app.icon ?? "")
     }
 
     AppOperations { id: ops; store: details.window.store; catalog: details.window.catalog; window: details.window }
     RemoveWindow {
         id: removeWindow
         transientParent: details.Window.window
+        store: details.window.store
+        registry: details.window
         onAccepted: (options, paths) => {
-            const id = ops.run(details.appKey, "Remove", "", options[0])
+            const id = ops.run(details.appKey, "Remove", "", options[0], details.app.icon)
             if (id > 0 && paths.length > 0) details.catalog.rememberLeftovers(id, JSON.stringify(paths))
+            removeWindow.follow(id)
         }
     }
     FontMetrics { id: metrics }
