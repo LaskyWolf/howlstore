@@ -32,11 +32,11 @@ QtObject {
             if (problem) window.dialogs.warning("Cannot open " + app.name, problem)
             return
         }
-        run(app.key, "Install", source ?? "", false)
+        run(app.key, "Install", source ?? "", false, app.icon)
     }
 
-    // Queues the operation; returns its id, or 0 when nothing was queued.
-    function run(key, action, source, removeUnused) {
+    // Queues the operation; returns its id, or 0 when nothing was queued. `icon` is the app's, for the progress window.
+    function run(key, action, source, removeUnused, icon) {
         const operation = JSON.parse(catalog.operation(key, action, source, removeUnused))
         if (operation.error) {
             window.dialogs.warning("Cannot " + action.toLowerCase(), operation.error)
@@ -46,6 +46,6 @@ QtObject {
             window.reviewAur(operation.aur, operation.title ?? "", action === "Reinstall")
             return 0
         }
-        return window.queueJob(operation.lane, operation.spec)
+        return window.queueJob(operation.lane, operation.spec, { icon: icon ?? "", key: key })
     }
 }

@@ -70,16 +70,20 @@ Item {
         const option = updates.removalOption(JSON.stringify(app))
         if (option === "") return
         removing = app
-        removeWindow.ask(app.name, [{ text: option, checked: true }], JSON.parse(updates.leftovers(JSON.stringify(app))))
+        removeWindow.ask(app.name, [{ text: option, checked: true }], JSON.parse(updates.leftovers(JSON.stringify(app))), app.icon ?? "")
     }
     RemoveWindow {
         id: removeWindow
         transientParent: page.Window.window
+        store: page.window.store
+        registry: page.window
         onAccepted: (options, paths) => {
             const app = page.removing
             const op = JSON.parse(page.updates.removalJob(JSON.stringify(app), options[0]))
-            if (op.error) { page.window.dialogs.warning("Cannot remove " + app.name, op.error); return }
-            page.updates.rememberLeftovers(page.window.queueJob(op.lane, op), app.name, JSON.stringify(paths))
+            if (op.error) { removeWindow.close(); page.window.dialogs.warning("Cannot remove " + app.name, op.error); return }
+            const id = page.window.queueJob(op.lane, op, { icon: app.icon ?? "" })
+            page.updates.rememberLeftovers(id, app.name, JSON.stringify(paths))
+            removeWindow.follow(id)
         }
     }
 

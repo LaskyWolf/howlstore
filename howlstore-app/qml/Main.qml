@@ -83,8 +83,12 @@ ApplicationWindow {
     property bool jobFailed: false  // A failure nobody has looked at
 
     /// Queues an operation (see Store.queueJob); `spec` is an object. Returns its id, 0 when refused.
-    function queueJob(lane, spec) {
-        return store.queueJob(lane, JSON.stringify(spec))
+    /// `meta` is for its progress window: {icon, key} of the app.
+    property var jobMeta: ({})
+    function queueJob(lane, spec, meta) {
+        const id = store.queueJob(lane, JSON.stringify(spec))
+        if (id > 0 && meta) jobMeta[id] = meta
+        return id
     }
     /// Installs AUR package `name` after the person reviewed its build files and those of the AUR packages it needs.
     function reviewAur(name, title, reinstall) {
@@ -103,7 +107,7 @@ ApplicationWindow {
         if (!jobWindows[id]) {
             const job = activity.find(a => a.id === id)
             if (!job) return null
-            jobWindows[id] = jobWindowComponent.createObject(root, { store: store, jobId: id, job: job })
+            jobWindows[id] = jobWindowComponent.createObject(root, { store: store, catalog: catalog, jobId: id, job: job, meta: jobMeta[id] ?? ({}) })
         }
         return jobWindows[id]
     }
