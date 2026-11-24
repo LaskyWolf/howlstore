@@ -1,5 +1,5 @@
 ---
-name: WoofStore
+name: HowlStore
 description: Native KDE software discovery and maintenance
 colors:
   category-create: "#674296"
@@ -110,7 +110,7 @@ components:
     height: "32px"
 ---
 
-# Design System: WoofStore
+# Design System: HowlStore
 
 ## Overview
 
@@ -230,7 +230,7 @@ Pagination bars have the frontmatter inactive and active hit-target dimensions, 
 
 The Explore title uses the explore-title token; no prototype-count badge appears beside it.
 
-Icons come from cached AppStream data and the WoofStore metadata folder. Screenshots download from publisher URLs once and stay in a disk cache. Entries without an icon use the themed package icon (no metadata) or generic application icon (metadata without an icon). No generated artwork is included.
+Icons come from cached AppStream data and the HowlStore metadata folder. Screenshots download from publisher URLs once and stay in a disk cache. Entries without an icon use the themed package icon (no metadata) or generic application icon (metadata without an icon). No generated artwork is included.
 
 ### Navigation
 

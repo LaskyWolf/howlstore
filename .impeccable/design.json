@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generatedAt": "2026-10-13T19:58:13.111341+00:00",
-  "title": "Design System: WoofStore",
+  "title": "Design System: HowlStore",
   "extensions": {
     "platform": "linux-desktop",
     "mode": "operate",
@@ -67,7 +67,7 @@
         "compactLabels": "Icon-only with accessible names and tooltips",
         "currentPage": "Preserved on collapse and expansion",
         "preferences": {
-          "storage": "QML Settings (~/.config/WoofStore/WoofStore.conf)",
+          "storage": "QML Settings (~/.config/HowlStore/HowlStore.conf)",
           "compactSidebar": "Persisted toggle state"
         },
         "activation": "Exclusive QButtonGroup with explicit stack switching on every click"

@@ -1,9 +1,9 @@
 <div align="center">
 
-<img src=".github/assets/banner.svg" width="100%" alt="WoofStore: one store and updater for Arch Linux" />
+<img src=".github/assets/banner.svg" width="100%" alt="HowlStore: one store and updater for Arch Linux" />
 
 [![Rust](https://img.shields.io/badge/Rust-cxx--qt-dea584?logo=rust&logoColor=white)](Cargo.toml)
-[![Qt 6](https://img.shields.io/badge/Qt_Quick-6-41CD52?logo=qt&logoColor=white)](woofstore-app/qml)
+[![Qt 6](https://img.shields.io/badge/Qt_Quick-6-41CD52?logo=qt&logoColor=white)](howlstore-app/qml)
 [![KDE](https://img.shields.io/badge/desktop-KDE-1d99f3?logo=kde&logoColor=white)](https://kde.org)
 [![Arch Linux](https://img.shields.io/badge/Arch-CachyOS-1793d1?logo=archlinux&logoColor=white)](https://cachyos.org)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
@@ -19,6 +19,8 @@ Flathub, pacman repositories and the AUR in one catalogue.
 
 </div>
 
+> **WoofStore is now HowlStore.** Existing WoofStore installs switch on their next update, with no extra step. Settings, imported AppImages and their launchers move over the first time HowlStore starts.
+
 ## Highlights
 
 | | |
@@ -33,16 +35,16 @@ Flathub, pacman repositories and the AUR in one catalogue.
 On Arch Linux or CachyOS:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/LaskyWolf/woofstore/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/LaskyWolf/howlstore/main/install.sh | bash
 ```
 
-The script builds a normal pacman package (`woofstore`) and installs it. It asks for your password through `sudo`, and pacman asks you to confirm. Run the same command again to update. To uninstall:
+The script builds a normal pacman package (`howlstore`) and installs it. It asks for your password through `sudo`, and pacman asks you to confirm. Run the same command again to update. To uninstall:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/LaskyWolf/woofstore/main/install.sh | bash -s -- --uninstall
+curl -fsSL https://raw.githubusercontent.com/LaskyWolf/howlstore/main/install.sh | bash -s -- --uninstall
 ```
 
-From a clone of this repository, `makepkg -si` does the same.
+From a clone of this repository, `makepkg -s` and then `sudo pacman -U howlstore-[0-9]*.pkg.tar.*` do the same. The build also makes a `woofstore` package: older WoofStore versions update through it, and it is not needed otherwise.
 
 Optional programs: `flatpak` for Flathub apps, `paru` for AUR packages and AUR updates, `devtools` to build AUR packages in a clean chroot.
 
@@ -52,8 +54,8 @@ Optional programs: `flatpak` for Flathub apps, `paru` for AUR packages and AUR u
 - **Installed:** the apps in your application menu, like the Start menu: Flatpaks, Arch packages, AUR/local packages, AppImages and other launchers (Steam game shortcuts are left out). Add AppImage and Add Flatpak accept files by click or drop and use the normal install window.
 - **Updates:** checks Arch, AUR, Flatpak and AppImage updates when the store starts and on demand.
   - **System Update** is the one button for everything: a full system upgrade (`pacman -Syu`) first, then the AUR packages, Flatpak apps and AppImages, then a list of orphan packages. Arch does not support updating one package alone, so the Arch rows have no button of their own. The button takes the accent colour while the system has updates and is grey otherwise. The sidebar badge is red when the system has updates and accent-coloured when only apps do.
-  - The run does not depend on the store: it keeps going if you close WoofStore, and a shutdown or suspend waits for it. Its output is saved in `~/.local/share/WoofStore/WoofStore/job/`; after the run the last one stays in `last-job.log` there. Open the store again to see how it ended. After an upgrade the store restarts itself only if the upgrade replaced a file it is running from (for example Qt); otherwise it keeps running.
-  - **WoofStore itself:** the Updates page lists a new WoofStore when GitHub has a newer release than the one running. It has its own Update button, and System Update includes it as the last step: it downloads the package GitHub Actions built for that release, checks its SHA-256, and installs it with `pacman -U`. If the release has no package or the checksum does not match, it builds the release with makepkg instead (the password is asked once more for that step). The store restarts, and opens the Updates page again, only when the files it runs from were replaced (its own new version, or a library such as Qt); otherwise it keeps running.
+  - The run does not depend on the store: it keeps going if you close HowlStore, and a shutdown or suspend waits for it. Its output is saved in `~/.local/share/HowlStore/HowlStore/job/`; after the run the last one stays in `last-job.log` there. Open the store again to see how it ended. After an upgrade the store restarts itself only if the upgrade replaced a file it is running from (for example Qt); otherwise it keeps running.
+  - **HowlStore itself:** the Updates page lists a new HowlStore when GitHub has a newer release than the one running. It has its own Update button, and System Update includes it as the last step: it downloads the package GitHub Actions built for that release, checks its SHA-256, and installs it with `pacman -U`. If the release has no package or the checksum does not match, it builds the release with makepkg instead (the password is asked once more for that step). The store restarts, and opens the Updates page again, only when the files it runs from were replaced (its own new version, or a library such as Qt); otherwise it keeps running.
   - The News page has a Filters button like Explore's that opens coloured topic buttons (Security, Gaming, Desktop, Hardware, Apps, Linux); with none chosen it shows everything. A topic comes from the source, the feed's own categories and words in the title and summary.
   - Before the upgrade, the confirmation lists Arch and CachyOS news published since your last System Update, so a manual intervention is read before it matters.
   - If `pacman -Syu` fails, nothing else is updated. A failure in the AUR, Flatpak or AppImage step is reported and the next step still runs.
@@ -61,10 +63,10 @@ Optional programs: `flatpak` for Flathub apps, `paru` for AUR packages and AUR u
   - AUR updates are built without the review step the store requires for a first install.
   - After an update that installs a new kernel, a desktop notification offers to restart.
 - **News:** cards with cover pictures in two or three columns, with search, from Arch Linux, CachyOS, the Linux kernel, KDE, LWN.net, 9to5Linux, Phoronix, GamingOnLinux, OMG! Ubuntu, Fedora Magazine, Linuxiac and It's FOSS. The page starts with the newest two articles per source; Show more adds more. Unread news from Arch Linux and CachyOS put an accent badge on the sidebar icon.
-- **Desktop links:** the installer makes WoofStore the program for `appstream:` links and for `.flatpakref` and `.flatpak` files. KRunner's "Install" suggestions and a downloaded `.flatpakref` of a catalogue app open on that app's page; a file for an app the catalogue does not list asks before it installs. Starting the store again hands the request to the open window. By hand: `gio mime application/vnd.flatpak.ref io.github.laskywolf.WoofStore.desktop` (and the same for `application/vnd.flatpak` and `x-scheme-handler/appstream`).
+- **Desktop links:** the installer makes HowlStore the program for `appstream:` links and for `.flatpakref` and `.flatpak` files. KRunner's "Install" suggestions and a downloaded `.flatpakref` of a catalogue app open on that app's page; a file for an app the catalogue does not list asks before it installs. Starting the store again hands the request to the open window. By hand: `gio mime application/vnd.flatpak.ref io.github.laskywolf.HowlStore.desktop` (and the same for `application/vnd.flatpak` and `x-scheme-handler/appstream`).
 - **Activity:** history of package operations. Click an entry to reopen its window.
 
-Run the store as your normal user. Steps that need root run through one small helper, `/usr/lib/woofstore/woofstore-root`, started with `pkexec`. It accepts only its own requests (install, install files, install Flatpak files, remove, upgrade, restart services) and checks every package name, file and service. Its polkit actions give the password dialog WoofStore's message, for example "WoofStore needs your password to install software.", and one password covers the next few minutes. The chroot tools and `paru` ask through `sudo`, with a KDialog or Zenity prompt.
+Run the store as your normal user. Steps that need root run through one small helper, `/usr/lib/howlstore/howlstore-root`, started with `pkexec`. It accepts only its own requests (install, install files, install Flatpak files, remove, upgrade, restart services) and checks every package name, file and service. Its polkit actions give the password dialog HowlStore's message, for example "HowlStore needs your password to install software.", and one password covers the next few minutes. The chroot tools and `paru` ask through `sudo`, with a KDialog or Zenity prompt.
 
 ## Installing and removing
 
@@ -72,8 +74,8 @@ Install, Reinstall and Remove run the real package manager in the background, on
 
 - **Flatpak:** `flatpak install --system -y <remote> <id>`.
 - **Repository:** `pacman -S --needed --noconfirm <name>`, through the root helper.
-- **AUR:** the store downloads the build files, shows the AUR facts (maintainer, votes, dates), lists lines to read twice (downloads, `curl | sh`, install scripts, unusual source hosts, skipped checksums) and shows what changed since you last approved the package. The Build button stays off until you tick "I read the recipe". It then builds in a clean chroot (package `devtools`) and installs only the built file with `pacman -U`, through the root helper. The chroot lives in `~/.cache/WoofStore/chroot` and uses the repositories of your `/etc/pacman.conf`, so dependencies from `multilib` or CachyOS resolve. The first build creates it (about 1 GB, a few minutes, asks for your password); later builds only update it. A chroot keeps the build away from your files; it is not a sandbox, and the installed package runs as root. Dependencies that no repository has are looked up in the AUR (up to 8 packages in all): you review the build files of each one, they are built first in the same chroot, and they are installed as dependencies before the package itself. A dependency that is neither in the repositories nor in the AUR stops the install with its name. Build files are downloaded under `~/.cache/WoofStore/aur-build`, not `/tmp`.
-- **AppImage:** copied to `~/.local/share/WoofStore/appimages` and added to the app menu, without being run. Updates need the update information the publisher embeds in the file (`gh-releases-zsync` or `zsync`): the store compares the checksum of your file with the one the publisher lists, and a newer file replaces the old one.
+- **AUR:** the store downloads the build files, shows the AUR facts (maintainer, votes, dates), lists lines to read twice (downloads, `curl | sh`, install scripts, unusual source hosts, skipped checksums) and shows what changed since you last approved the package. The Build button stays off until you tick "I read the recipe". It then builds in a clean chroot (package `devtools`) and installs only the built file with `pacman -U`, through the root helper. The chroot lives in `~/.cache/HowlStore/chroot` and uses the repositories of your `/etc/pacman.conf`, so dependencies from `multilib` or CachyOS resolve. The first build creates it (about 1 GB, a few minutes, asks for your password); later builds only update it. A chroot keeps the build away from your files; it is not a sandbox, and the installed package runs as root. Dependencies that no repository has are looked up in the AUR (up to 8 packages in all): you review the build files of each one, they are built first in the same chroot, and they are installed as dependencies before the package itself. A dependency that is neither in the repositories nor in the AUR stops the install with its name. Build files are downloaded under `~/.cache/HowlStore/aur-build`, not `/tmp`.
+- **AppImage:** copied to `~/.local/share/HowlStore/appimages` and added to the app menu, without being run. Updates need the update information the publisher embeds in the file (`gh-releases-zsync` or `zsync`): the store compares the checksum of your file with the one the publisher lists, and a newer file replaces the old one.
 - **Remove:** a dialog asks what else to delete. Caches are pre-selected; settings and data (`~/.config`, `~/.local/share`, `~/.var/app`) are not. Only folders whose name equals the app or package name are offered.
 - **Open:** Flatpaks start with `flatpak run`; other apps through their desktop file.
 
@@ -81,15 +83,15 @@ Pacman installs can cause a partial upgrade if your repository database is newer
 
 ## Network
 
-The store contacts only these services: Flathub (catalogue, statistics), the Arch mirrors through `pacman`, the AUR, pkgstats and odrs.gnome.org (ratings, with the Flatpak ID of the app you open), api.github.com and the AppImage publisher's release files (AppImage updates), the news sources above, and duckduckgo.com (a short description for an installed app that no package database knows). Answers are cached in `~/.cache/WoofStore`.
+The store contacts only these services: Flathub (catalogue, statistics), the Arch mirrors through `pacman`, the AUR, pkgstats and odrs.gnome.org (ratings, with the Flatpak ID of the app you open), api.github.com and the AppImage publisher's release files (AppImage updates), the news sources above, and duckduckgo.com (a short description for an installed app that no package database knows). Answers are cached in `~/.cache/HowlStore`.
 
 ## Development
 
 The code is a Cargo workspace:
 
-- `woofstore-core`: logic that needs no user interface and touches no network: job runner and lane queue, AppImage update information and import, update and AUR build scripts, catalogue model and merging, launchers, news feeds, build-file review, leftovers.
-- `woofstore-system`: access to the system and the network: commands with a time limit, HTTP with a disk cache, the catalogue, installed apps, news, rankings, AUR services, update checks, and the activity of package operations.
-- `woofstore-app`: the window, built with [cxx-qt](https://github.com/KDAB/cxx-qt) and QML in the Plasma style (qqc2-desktop-style).
+- `howlstore-core`: logic that needs no user interface and touches no network: job runner and lane queue, AppImage update information and import, update and AUR build scripts, catalogue model and merging, launchers, news feeds, build-file review, leftovers.
+- `howlstore-system`: access to the system and the network: commands with a time limit, HTTP with a disk cache, the catalogue, installed apps, news, rankings, AUR services, update checks, and the activity of package operations.
+- `howlstore-app`: the window, built with [cxx-qt](https://github.com/KDAB/cxx-qt) and QML in the Plasma style (qqc2-desktop-style).
 - `packaging`: the root helper and its polkit actions.
 
 Install the dependencies, then build, test and run:
@@ -103,10 +105,10 @@ cargo test
 ```
 
 ```bash
-cargo run --release -p woofstore-app
+cargo run --release -p howlstore-app
 ```
 
-QML files are compiled into the program, so run `cargo run` again after editing them. The tests run the generated scripts and the root helper with stand-ins for pkexec, pacman, paru, flatpak, systemctl and curl, so they change nothing on the system. A build that is not installed runs the root helper from `packaging/`, and Plasma shows the generic pkexec password dialog instead of WoofStore's.
+QML files are compiled into the program, so run `cargo run` again after editing them. The tests run the generated scripts and the root helper with stand-ins for pkexec, pacman, paru, flatpak, systemctl and curl, so they change nothing on the system. A build that is not installed runs the root helper from `packaging/`, and Plasma shows the generic pkexec password dialog instead of HowlStore's.
 
 If no Flatpak catalogue is available, configure a remote and restart the store:
 
@@ -123,8 +125,8 @@ Catalogue data:
 
 Checks without a person:
 
-- `WOOFSTORE_QUIT_AFTER_MS=3000 WOOFSTORE_SCREENSHOT=/tmp/shot.png` makes the window save a picture of itself and quit. `WOOFSTORE_PREVIEW` picks a page and its states, for example `installed,expanded` (see `woofstore-app/qml/Main.qml`).
-- `WOOFSTORE_SCRIPT=steps.txt` (with `WOOFSTORE_QUIT_AFTER_MS` as the start delay) plays input into the window, one step per line: `wait MS`, `move X Y`, `click X Y`, `wheel X Y NOTCHES`, `touchpad X Y DX DY` (a trackpad step in pixels; `touchpad X Y 0 0` lifts the fingers), `type TEXT`, `key Return|Escape|Down|Up|Tab|Backspace`, `shot PATH`, `eval JS` (prints the result).
+- `HOWLSTORE_QUIT_AFTER_MS=3000 HOWLSTORE_SCREENSHOT=/tmp/shot.png` makes the window save a picture of itself and quit. `HOWLSTORE_PREVIEW` picks a page and its states, for example `installed,expanded` (see `howlstore-app/qml/Main.qml`).
+- `HOWLSTORE_SCRIPT=steps.txt` (with `HOWLSTORE_QUIT_AFTER_MS` as the start delay) plays input into the window, one step per line: `wait MS`, `move X Y`, `click X Y`, `wheel X Y NOTCHES`, `touchpad X Y DX DY` (a trackpad step in pixels; `touchpad X Y 0 0` lifts the fingers), `type TEXT`, `key Return|Escape|Down|Up|Tab|Backspace`, `shot PATH`, `eval JS` (prints the result).
 - Add `QT_FORCE_STDERR_LOGGING=1` to see QML warnings: without a terminal Qt writes them to the system journal. Keyboard steps need an active window; run the store inside `kwin_wayland --virtual --exit-with-session <script>` to get one.
 
 ## License
@@ -141,12 +143,12 @@ Software and data:
 - [pkgstats](https://pkgstats.archlinux.de): popularity of repository packages.
 - [ODRS](https://odrs.gnome.org): app ratings.
 - AppImage publishers: update information and release files, read through `api.github.com`.
-- The GitHub releases of [WoofStore](https://github.com/LaskyWolf/woofstore/releases): updates of the store itself.
+- The GitHub releases of [HowlStore](https://github.com/LaskyWolf/howlstore/releases): updates of the store itself.
 - DuckDuckGo: a short description for an installed app that no package database knows.
 
 Update tools:
 
-- [cachy-update](https://github.com/CachyOS/cachy-update) and [arch-update](https://github.com/Antiz96/arch-update): the model for System Update (news before upgrading, cache cleanup, service restarts, orphan packages, restart after a kernel update). WoofStore does not use their code or call them.
+- [cachy-update](https://github.com/CachyOS/cachy-update) and [arch-update](https://github.com/Antiz96/arch-update): the model for System Update (news before upgrading, cache cleanup, service restarts, orphan packages, restart after a kernel update). HowlStore does not use their code or call them.
 - `pacman-contrib` (`checkupdates`, `paccache`, `checkservices`) and `expac`.
 
 News feeds: [Arch Linux](https://archlinux.org/news/), [CachyOS](https://cachyos.org/blog/), [Linux kernel](https://www.kernel.org), [KDE](https://kde.org/announcements/), [LWN.net](https://lwn.net), [9to5Linux](https://9to5linux.com), [Phoronix](https://www.phoronix.com), [GamingOnLinux](https://www.gamingonlinux.com), [OMG! Ubuntu](https://www.omgubuntu.co.uk), [Fedora Magazine](https://fedoramagazine.org), [Linuxiac](https://linuxiac.com), [It's FOSS](https://itsfoss.com), [Linux Mint](https://blog.linuxmint.com), [Blender](https://www.blender.org), [Krita](https://krita.org), [Godot](https://godotengine.org), [LibreOffice](https://blog.documentfoundation.org) and [Flathub](https://docs.flathub.org/blog).

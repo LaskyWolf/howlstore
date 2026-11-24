@@ -1,4 +1,4 @@
-# WoofStore
+# HowlStore
 
 <!-- impeccable:product-schema 1 -->
 
@@ -47,7 +47,7 @@ Use GNOME Software-style app discovery with persistent KDE navigation. Inherit t
 
 ## Replaces
 
-WoofStore is meant to replace Cachy-Update (arch-update) and Shelly. Missing before both can be removed: background update checks with a tray icon and notification, listing every installed package (not only apps with a launcher), downgrade, hold and ignore marks, `.pacnew` handling, orphan and cache cleanup, news before the update.
+HowlStore is meant to replace Cachy-Update (arch-update) and Shelly. Missing before both can be removed: background update checks with a tray icon and notification, listing every installed package (not only apps with a launcher), downgrade, hold and ignore marks, `.pacnew` handling, orphan and cache cleanup, news before the update.
 
 ## Open Decisions
 

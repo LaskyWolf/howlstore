@@ -20,7 +20,7 @@ jobs:
     container: archlinux:base-devel
     env:
       TAG: ${{ github.event.release.tag_name || inputs.tag }}
-      PACKAGE: woofstore-x86_64.pkg.tar.zst  # The name the updater asks for (RELEASE_PACKAGE in woofstore-core/src/updates.rs)
+      PACKAGE: howlstore-x86_64.pkg.tar.zst  # The name the updater asks for (RELEASE_PACKAGE in howlstore-core/src/updates.rs)
     steps:
       - name: Install git and the GitHub CLI
         run: pacman -Syu --noconfirm git github-cli
@@ -39,15 +39,18 @@ jobs:
 
       - name: Check the version matches the tag
         run: |
-          built=$(ls woofstore-[0-9]*-x86_64.pkg.tar.zst)
+          built=$(ls howlstore-[0-9]*-x86_64.pkg.tar.zst)
           case $built in
-            "woofstore-${TAG#v}-"*) echo "Built $built" ;;
+            "howlstore-${TAG#v}-"*) echo "Built $built" ;;
             *) echo "::error::$built does not match $TAG; update pkgver in PKGBUILD"; exit 1 ;;
           esac
           cp "$built" "$PACKAGE"
           sha256sum "$PACKAGE" > "$PACKAGE.sha256"
+          # The old name, for WoofStore builds that download woofstore-x86_64.pkg.tar.zst
+          cp woofstore-[0-9]*-x86_64.pkg.tar.zst woofstore-x86_64.pkg.tar.zst
+          sha256sum woofstore-x86_64.pkg.tar.zst > woofstore-x86_64.pkg.tar.zst.sha256
 
       - name: Attach to the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "$TAG" "$PACKAGE" "$PACKAGE.sha256" --clobber --repo "$GITHUB_REPOSITORY"
+        run: gh release upload "$TAG" "$PACKAGE" "$PACKAGE.sha256" woofstore-x86_64.pkg.tar.zst woofstore-x86_64.pkg.tar.zst.sha256 --clobber --repo "$GITHUB_REPOSITORY"

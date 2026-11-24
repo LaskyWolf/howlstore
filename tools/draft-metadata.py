@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Draft one AppStream <component> for an AUR package (developer tool, never run by the app).
 
-The output is a draft for a human to review and paste into metadata/xml/woofstore.xml.
+The output is a draft for a human to review and paste into metadata/xml/howlstore.xml.
 Image URLs found upstream are listed only as XML comments: the tool never invents images
 and never puts an unverified image into a <screenshot> element.
 """
@@ -15,7 +15,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 
-USER_AGENT = "WoofStore-metadata-drafter"
+USER_AGENT = "HowlStore-metadata-drafter"
 TIMEOUT = 20
 TEXT_CAP = 20_000  # characters of upstream text sent to the model
 DOWNLOAD_CAP = 2_000_000  # bytes; protects against huge pages

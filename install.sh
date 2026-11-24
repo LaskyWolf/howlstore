@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# WoofStore installer for Arch Linux and CachyOS.
+# HowlStore installer for Arch Linux and CachyOS.
 #
-#   Install or update:  curl -fsSL https://raw.githubusercontent.com/LaskyWolf/woofstore/main/install.sh | bash
-#   Uninstall:          curl -fsSL https://raw.githubusercontent.com/LaskyWolf/woofstore/main/install.sh | bash -s -- --uninstall
+#   Install or update:  curl -fsSL https://raw.githubusercontent.com/LaskyWolf/howlstore/main/install.sh | bash
+#   Uninstall:          curl -fsSL https://raw.githubusercontent.com/LaskyWolf/howlstore/main/install.sh | bash -s -- --uninstall
 #
-# Builds a normal pacman package (woofstore) from the source and installs it, so pacman can update and remove it.
+# Builds a normal pacman package (howlstore) from the source and installs it, so pacman can update and remove it.
 # It asks for your password through sudo, and pacman asks you to confirm before it installs anything.
 set -euo pipefail
 
-REPO="${WOOFSTORE_REPO:-https://github.com/LaskyWolf/woofstore}"
-REF="${WOOFSTORE_REF:-main}"
-SOURCE="${WOOFSTORE_SOURCE:-}"  # a local checkout instead of downloading (for testing)
-YES="${WOOFSTORE_ASSUME_YES:-}"  # 1 answers pacman's questions
+REPO="${HOWLSTORE_REPO:-https://github.com/LaskyWolf/howlstore}"
+REF="${HOWLSTORE_REF:-main}"
+SOURCE="${HOWLSTORE_SOURCE:-}"  # a local checkout instead of downloading (for testing)
+YES="${HOWLSTORE_ASSUME_YES:-}"  # 1 answers pacman's questions
 
 say() { printf '\033[1m==> %s\033[0m\n' "$*"; }
 fail() { printf '\033[31mError: %s\033[0m\n' "$*" >&2; exit 1; }
@@ -22,12 +22,12 @@ ask_from_tty() { if [ -z "$YES" ] && [ -r /dev/tty ]; then "$@" </dev/tty; else 
 [ "$(id -u)" -ne 0 ] || fail "run this as your normal user, not as root. makepkg refuses to build as root; sudo is used where it is needed."
 [ -r /etc/os-release ] || fail "can't tell which Linux distribution this is (/etc/os-release is missing)."
 . /etc/os-release
-case " $ID ${ID_LIKE:-} " in *" arch "*|*" cachyos "*) ;; *) fail "WoofStore needs Arch Linux or a distribution based on it, like CachyOS. This is: ${PRETTY_NAME:-$ID}." ;; esac
+case " $ID ${ID_LIKE:-} " in *" arch "*|*" cachyos "*) ;; *) fail "HowlStore needs Arch Linux or a distribution based on it, like CachyOS. This is: ${PRETTY_NAME:-$ID}." ;; esac
 
 if [ "${1:-}" = "--uninstall" ]; then
-    say "Removing woofstore"
-    ask_from_tty sudo pacman -Rns ${YES:+--noconfirm} woofstore
-    say "Removed. Settings and caches stay in ~/.config/WoofStore, ~/.local/share/WoofStore and ~/.cache/WoofStore."
+    say "Removing howlstore"
+    ask_from_tty sudo pacman -Rns ${YES:+--noconfirm} $(pacman -Qq howlstore woofstore 2>/dev/null)
+    say "Removed. Settings and caches stay in ~/.config/HowlStore, ~/.local/share/HowlStore and ~/.cache/HowlStore."
     exit 0
 fi
 
@@ -42,27 +42,29 @@ if [ -n "$SOURCE" ]; then
     say "Using the local source in $SOURCE"
     tar -C "$SOURCE" --exclude=./target --exclude=./src --exclude=./pkg --exclude=./.git -cf - . | tar -C "$work" -xf -
 else
-    say "Downloading WoofStore ($REF)"
+    say "Downloading HowlStore ($REF)"
     curl -fsSL "$REPO/archive/$REF.tar.gz" | tar -xz -C "$work" --strip-components=1
 fi
-[ -f "$work/PKGBUILD" ] || fail "the download has no PKGBUILD. Check WOOFSTORE_REPO and WOOFSTORE_REF."
+[ -f "$work/PKGBUILD" ] || fail "the download has no PKGBUILD. Check HOWLSTORE_REPO and HOWLSTORE_REF."
 
 # 3. Build and install the package; makepkg installs the runtime dependencies listed in the PKGBUILD
-say "Building and installing woofstore (Rust compiles for a few minutes)"
+say "Building and installing howlstore (Rust compiles for a few minutes)"
 cd "$work"
-ask_from_tty makepkg -si ${YES:+--noconfirm}
+ask_from_tty makepkg -s ${YES:+--noconfirm}
+# The PKGBUILD also builds woofstore for old WoofStore updaters; this installs howlstore, which replaces it (--ask 4 says yes)
+ask_from_tty sudo pacman -U --ask 4 ${YES:+--noconfirm} howlstore-[0-9]*.pkg.tar.*
 
 # 4. KRunner and web pages offer "Install this app" as an appstream: link, and Flathub gives .flatpakref files; make the store the program that opens them
-handler=io.github.laskywolf.WoofStore.desktop
+handler=io.github.laskywolf.HowlStore.desktop
 for type in x-scheme-handler/appstream application/vnd.flatpak.ref application/vnd.flatpak; do
   if gio mime "$type" "$handler" >/dev/null 2>&1 || xdg-mime default "$handler" "$type" >/dev/null 2>&1; then
-    say "$type now opens in WoofStore"
+    say "$type now opens in HowlStore"
   else
-    echo "Could not set WoofStore as the handler of $type. Run: gio mime $type $handler"
+    echo "Could not set HowlStore as the handler of $type. Run: gio mime $type $handler"
   fi
 done
 
-say "Installed WoofStore. Open it from the application menu, or run: woof-store"
+say "Installed HowlStore. Open it from the application menu, or run: howl-store"
 cat <<EOF
 
 Update: run the same command again.

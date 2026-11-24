@@ -488,6 +488,54 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
+name = "howlstore-app"
+version = "2.1.0"
+dependencies = [
+ "chrono",
+ "cxx",
+ "cxx-qt",
+ "cxx-qt-build",
+ "cxx-qt-lib",
+ "howlstore-core",
+ "howlstore-system",
+ "serde_json",
+ "tempfile",
+]
+
+[[package]]
+name = "howlstore-core"
+version = "2.1.0"
+dependencies = [
+ "chrono",
+ "flate2",
+ "html-escape",
+ "percent-encoding",
+ "quick-xml",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "url",
+]
+
+[[package]]
+name = "howlstore-system"
+version = "2.1.0"
+dependencies = [
+ "flate2",
+ "hex",
+ "howlstore-core",
+ "quick-xml",
+ "regex",
+ "serde_json",
+ "sha1",
+ "tempfile",
+ "ureq",
+ "wait-timeout",
+]
+
+[[package]]
 name = "html-escape"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1426,54 +1474,6 @@ name = "windows_x86_64_msvc"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
-
-[[package]]
-name = "woofstore-app"
-version = "2.0.1"
-dependencies = [
- "chrono",
- "cxx",
- "cxx-qt",
- "cxx-qt-build",
- "cxx-qt-lib",
- "serde_json",
- "tempfile",
- "woofstore-core",
- "woofstore-system",
-]
-
-[[package]]
-name = "woofstore-core"
-version = "2.0.1"
-dependencies = [
- "chrono",
- "flate2",
- "html-escape",
- "percent-encoding",
- "quick-xml",
- "regex",
- "serde",
- "serde_json",
- "sha2",
- "tempfile",
- "url",
-]
-
-[[package]]
-name = "woofstore-system"
-version = "2.0.1"
-dependencies = [
- "flate2",
- "hex",
- "quick-xml",
- "regex",
- "serde_json",
- "sha1",
- "tempfile",
- "ureq",
- "wait-timeout",
- "woofstore-core",
-]
 
 [[package]]
 name = "writeable"
